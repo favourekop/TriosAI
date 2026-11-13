@@ -1,3 +1,4 @@
+import { supabase } from "./lib/supabase";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   Activity, ArrowUpRight, AudioLines, Bot, Check, ChevronDown, CircleHelp, FileText,
