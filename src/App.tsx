@@ -36,6 +36,33 @@ function App() {
   const [selectedTool, setSelectedTool] = useState("Image");\n  const [userEmail, setUserEmail] = useState<string | null>(null);\n  const [accessToken, setAccessToken] = useState<string | null>(null);\n  const [authBusy, setAuthBusy] = useState(false);
 
   useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data }) => {
+      setUserEmail(data.session?.user.email ?? null);
+      setAccessToken(data.session?.access_token ?? null);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user.email ?? null);
+      setAccessToken(session?.access_token ?? null);
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  async function signIn() {
+    if (!supabase) { notify("Google sign-in needs the Supabase URL and anon key configured."); return; }
+    setAuthBusy(true);
+    const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin } });
+    if (error) notify(error.message);
+    setAuthBusy(false);
+  }
+
+  async function signOut() {
+    if (!supabase) return;
+    const { error } = await supabase.auth.signOut();
+    if (error) notify(error.message); else notify("You have signed out.");
+  }
+
+  useEffect(() => {
     fetch("/api/health").then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(() => setApiStatus("online")).catch(() => setApiStatus("offline"));
     fetch("/api/plans").then(r => r.json()).then(data => setPlans(data.plans || [])).catch(() => setPlans([]));
