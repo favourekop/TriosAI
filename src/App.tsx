@@ -61,7 +61,7 @@ function App() {
     setSending(true);
     try {
       const response = await fetch("/api/chat", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json", ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
         body: JSON.stringify({ messages: next })
       });
       const data = await response.json();
