@@ -118,7 +118,7 @@ create policy "Users read own subscriptions" on subscriptions for select to auth
 
 -- Payment events and audit records are server-only: no client policies are granted.
 revoke all on payment_events, admin_audit_log from anon, authenticated;
-grant select, update on profiles to authenticated;
+grant select on profiles to authenticated;\ngrant update (display_name, timezone) on profiles to authenticated;
 grant select on usage_events, subscriptions to authenticated;
 grant select, insert, update, delete on conversations, messages to authenticated;
 
