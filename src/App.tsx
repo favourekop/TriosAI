@@ -32,7 +32,7 @@ function App() {
   const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking");
   const [plans, setPlans] = useState<Plan[]>([]);
   const [toast, setToast] = useState("");
-  const [selectedTool, setSelectedTool] = useState("Image");
+  const [selectedTool, setSelectedTool] = useState("Image");\n  const [userEmail, setUserEmail] = useState<string | null>(null);\n  const [accessToken, setAccessToken] = useState<string | null>(null);\n  const [authBusy, setAuthBusy] = useState(false);
 
   useEffect(() => {
     fetch("/api/health").then(r => { if (!r.ok) throw new Error(); return r.json(); })
@@ -84,7 +84,7 @@ function App() {
       </aside>
       {mobileNav && <button className="scrim" aria-label="Close navigation" onClick={() => setMobileNav(false)} />}
       <main className="main">
-        <header className="topbar"><div className="top-left"><button className="icon-btn menu-btn" onClick={() => setMobileNav(true)} aria-label="Open menu"><Menu size={20}/></button><span className="breadcrumb">Workspace <span>/</span> {tab}</span></div><div className="top-actions"><div className="status"><i className={apiStatus === "online" ? "status-dot online" : "status-dot"}/>{apiStatus === "checking" ? "Checking API" : apiStatus === "online" ? "API connected" : "API unavailable"}</div><button className="icon-btn" onClick={() => setDark(!dark)} aria-label="Toggle theme">{dark ? <Sun size={18}/> : <Moon size={18}/>}</button><button className="help-btn" onClick={() => notify("Help centre is coming soon.")}><CircleHelp size={17}/><span>Help</span></button><div className="avatar small">FE</div></div></header>
+        <header className="topbar"><div className="top-left"><button className="icon-btn menu-btn" onClick={() => setMobileNav(true)} aria-label="Open menu"><Menu size={20}/></button><span className="breadcrumb">Workspace <span>/</span> {tab}</span></div><div className="top-actions"><div className="status"><i className={apiStatus === "online" ? "status-dot online" : "status-dot"}/>{apiStatus === "checking" ? "Checking API" : apiStatus === "online" ? "API connected" : "API unavailable"}</div><button className="icon-btn" onClick={() => setDark(!dark)} aria-label="Toggle theme">{dark ? <Sun size={18}/> : <Moon size={18}/>}</button><button className="help-btn" onClick={() => notify("Help centre is coming soon.")}><CircleHelp size={17}/><span>Help</span></button>{userEmail ? <button className="auth-btn" onClick={() => void signOut()} title={userEmail}>Sign out</button> : <button className="auth-btn" disabled={authBusy} onClick={() => void signIn()}>{authBusy ? "Connecting…" : "Continue with Google"}</button>}<div className="avatar small">{userEmail ? userEmail.slice(0,1).toUpperCase() : "FE"}</div></div></header>
         <div className="content">
           {tab === "Overview" && <section className="page">
             <div className="welcome-row"><div><div className="eyebrow"><span className="eyebrow-line"/> YOUR WORKSPACE</div><h1>{greeting}, <span>Explorer.</span></h1><p className="subheading">Your ideas deserve room to grow. What shall we create today?</p></div><div className="date-chip"><Activity size={15}/> Your creative space</div></div>
