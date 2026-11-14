@@ -33,7 +33,10 @@ function App() {
   const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking");
   const [plans, setPlans] = useState<Plan[]>([]);
   const [toast, setToast] = useState("");
-  const [selectedTool, setSelectedTool] = useState("Image");\n  const [userEmail, setUserEmail] = useState<string | null>(null);\n  const [accessToken, setAccessToken] = useState<string | null>(null);\n  const [authBusy, setAuthBusy] = useState(false);
+  const [selectedTool, setSelectedTool] = useState("Image");
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [authBusy, setAuthBusy] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
