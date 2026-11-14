@@ -3,7 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
 import OpenAI from "openai";
-import { z } from "zod";\nimport { createClient } from "@supabase/supabase-js";
+import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
 import { PLANS } from "./plans";
 
 dotenv.config();
@@ -22,7 +23,22 @@ app.use("/api", rateLimit({ windowMs: 60_000, limit: 60, standardHeaders: "draft
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "triosai-api", timestamp: new Date().toISOString() }));
 app.get("/api/plans", (_req, res) => res.json({ plans: Object.values(PLANS) }));
 
-const requireAuth: express.RequestHandler = async (req, res, next) => {\n  const token = req.headers.authorization?.startsWith("Bearer ") ? req.headers.authorization.slice(7) : null;\n  if (!token) return res.status(401).json({ error: "Sign in to use your AI workspace." });\n  const url = process.env.SUPABASE_URL;\n  const anonKey = process.env.SUPABASE_ANON_KEY;\n  if (!url || !anonKey) return res.status(503).json({ error: "Authentication is not configured on the server yet." });\n  try {\n    const authClient = createClient(url, anonKey, { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${token}` } } });\n    const { data, error } = await authClient.auth.getUser(token);\n    if (error || !data.user) return res.status(401).json({ error: "Your session is invalid or expired. Please sign in again." });\n    res.locals.userId = data.user.id;\n    next();\n  } catch { return res.status(401).json({ error: "Unable to verify your session." }); }\n};\n\nconst chatSchema = z.object({
+const requireAuth: express.RequestHandler = async (req, res, next) => {
+  const token = req.headers.authorization?.startsWith("Bearer ") ? req.headers.authorization.slice(7) : null;
+  if (!token) return res.status(401).json({ error: "Sign in to use your AI workspace." });
+  const url = process.env.SUPABASE_URL;
+  const anonKey = process.env.SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return res.status(503).json({ error: "Authentication is not configured on the server yet." });
+  try {
+    const authClient = createClient(url, anonKey, { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${token}` } } });
+    const { data, error } = await authClient.auth.getUser(token);
+    if (error || !data.user) return res.status(401).json({ error: "Your session is invalid or expired. Please sign in again." });
+    res.locals.userId = data.user.id;
+    next();
+  } catch { return res.status(401).json({ error: "Unable to verify your session." }); }
+};
+
+const chatSchema = z.object({
   messages: z.array(z.object({
     role: z.enum(["user", "assistant"]),
     content: z.string().min(1).max(12_000)
